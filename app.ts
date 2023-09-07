@@ -6,7 +6,8 @@ import cors from "cors";
 require("dotenv").config();
 import cookieParser from "cookie-parser";
 
-
+// File Imports
+import { ErrorMiddleware } from "./middleware/error";
 
 export const app = express();
 
@@ -38,3 +39,6 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 	error.statusCode = 404;
 	next(error);
 });
+
+// Handle errors
+app.use(ErrorMiddleware);
