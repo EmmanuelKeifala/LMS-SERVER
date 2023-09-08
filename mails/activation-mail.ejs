@@ -1,0 +1,104 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Activate Your Account</title>
+		<style>
+			/* <!-- ... (your CSS styles here) ... --> */
+		</style>
+	</head>
+	<body>
+		<span class="preheader">Activate Your Account</span>
+		<table
+			role="presentation"
+			border="0"
+			cellpadding="0"
+			cellspacing="0"
+			class="body">
+			<tr>
+				<td>&nbsp;</td>
+				<td class="container">
+					<div class="content">
+						<!-- START CENTERED WHITE CONTAINER -->
+						<table role="presentation" class="main">
+							<!-- START MAIN CONTENT AREA -->
+							<tr>
+								<td class="wrapper">
+									<table
+										role="presentation"
+										border="0"
+										cellpadding="0"
+										cellspacing="0">
+										<tr>
+											<td>
+												<p>Hi <%= data.user.name %>,</p>
+												<p>Thank you for registering with us, ELEARN</p>
+												<table
+													role="presentation"
+													border="0"
+													cellpadding="0"
+													cellspacing="0"
+													class="btn btn-primary">
+													<tbody>
+														<tr>
+															<td align="left">
+																<table
+																	role="presentation"
+																	border="0"
+																	cellpadding="0"
+																	cellspacing="0">
+																	<tbody>
+																		<tr>
+																			<td><%= data.activationCode %></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+												<p>
+													Please enter the activation code on the activation
+													page in the next 5 minutes
+												</p>
+												<p>
+													If you did not register on ELearn, just ignore this
+													email
+												</p>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<!-- END MAIN CONTENT AREA -->
+						</table>
+						<!-- END CENTERED WHITE CONTAINER -->
+
+						<!-- START FOOTER -->
+						<div class="footer">
+							<table
+								role="presentation"
+								border="0"
+								cellpadding="0"
+								cellspacing="0">
+								<tr>
+									<td class="content-block">
+										<span class="apple-link">ELearn, Sierra Leone</span>
+										<br />
+										Don't like these emails?
+										<a href="emmanuelkeifala@gmail.com">Unsubscribe</a>.
+									</td>
+								</tr>
+							</table>
+						</div>
+						<!-- END FOOTER -->
+					</div>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+		</table>
+	</body>
+</html>

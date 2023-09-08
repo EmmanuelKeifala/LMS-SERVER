@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 
 // File Imports
 import { ErrorMiddleware } from "./middleware/error";
+import userRouter from "./routes/user.route";
 
 export const app = express();
 
@@ -24,6 +25,9 @@ app.use(
 	}),
 );
 
+// routes
+app.use("/api/v1", userRouter);
+
 // Testing the API
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
 	res.status(200).json({
@@ -31,6 +35,7 @@ app.get("/test", (req: Request, res: Response, next: NextFunction) => {
 		message: "APi is working",
 	});
 });
+
 
 // Unknow api route request
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -42,3 +47,5 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 
 // Handle errors
 app.use(ErrorMiddleware);
+
+
