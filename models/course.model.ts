@@ -1,18 +1,18 @@
 /** @format */
 
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { IUser } from "./user.model";
 
 interface IComment extends Document {
 	question: string;
-	questionReplies: object[];
-
-	user: object;
+	questionReplies: IComment[];
+	user: IUser;
 }
 interface IReview extends Document {
 	rating: number;
 	comment: string;
-	user: object;
-	questionReplies: IComment[];
+	user: IUser;
+	commentReplies: IComment[];
 }
 
 interface ILink extends Document {
@@ -30,7 +30,7 @@ interface ICourseData extends Document {
 	videoPlayer: string;
 	links: ILink[];
 	suggestion: string;
-	questions: ILink[];
+	questions: IComment[];
 }
 interface ICourse extends Document {
 	name: string;

@@ -2,7 +2,9 @@
 
 import express from "express";
 import {
+	addAnswer,
 	addQuestion,
+	addReview,
 	courseUpload,
 	editCourse,
 	getAllCourses,
@@ -39,4 +41,10 @@ courseRouter.get("/get-course-content/:id", isAuthenticated, getCourseByUser);
 
 // Add questions to course
 courseRouter.put("/add-questions", isAuthenticated, addQuestion);
+
+// Adding question replies
+courseRouter.put("/add-answer", isAuthenticated, addAnswer);
+
+// Add reviews
+courseRouter.put("/add-review", isAuthenticated, addReview);
 export default courseRouter;

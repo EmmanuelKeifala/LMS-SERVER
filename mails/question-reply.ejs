@@ -1,0 +1,94 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>New Answer Notification</title>
+		<style>
+			/* Add your email styles here */
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #f5f5f5;
+				margin: 0;
+				padding: 0;
+			}
+
+			.container {
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #ffffff;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.header {
+				background-color: #007bff;
+				padding: 10px 0;
+				text-align: center;
+			}
+
+			.header h1 {
+				color: #fff;
+			}
+
+			h1 {
+				color: #333;
+			}
+
+			p {
+				color: #666;
+				line-height: 1.6;
+			}
+
+			.btn {
+				display: inline-block;
+				background-color: #007bff;
+				color: #fff;
+				padding: 10px 20px;
+				text-decoration: none;
+				border-radius: 4px;
+			}
+
+			.footer {
+				margin-top: 20px;
+				text-align: center;
+				color: #fff;
+				background-color: #007bff;
+				padding: 10px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>New Answer on ELearn</h1>
+			</div>
+			<p>Hello <%= data.name %>,</p>
+			<p>
+				We are excited to inform you that a new answer has been posted for your
+				question on ELearn. Here are the details:
+			</p>
+			<br><strong>Question:</strong> <%= data.title %> </br> <p><%= data.question %></p></p>
+			<p><strong>New Answer:</strong></p>
+			<blockquote><%= data.answer %></blockquote>
+			<p>
+				Click the button below to view the full answer and continue the
+				discussion:
+			</p>
+			<a href="[Link to Question]" class="btn">View Answer</a>
+			<p>
+				If you have any more questions or need further assistance, feel free to
+				ask.
+			</p>
+			<p>Thank you for using ELearn!</p>
+			<div class="footer">
+				<p>
+					This email was sent to <%= data.email %> - If you believe this is a
+					mistake, please contact support.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

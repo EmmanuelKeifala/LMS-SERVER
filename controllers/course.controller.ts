@@ -2,7 +2,7 @@
 // Package Imports
 import { NextFunction, Response, Request } from "express";
 import cloudinary from "cloudinary";
-
+import ejs from "ejs";
 // File Imports
 import { CatchAsyncErrors } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/ErrorHandler";
@@ -10,6 +10,8 @@ import { createCourse } from "../services/course.services";
 import courseModel from "../models/course.model";
 import { redis } from "../utils/redis";
 import mongoose from "mongoose";
+import path from "path";
+import sendEmail from "../utils/sendMail";
 
 // The course upload function
 export const courseUpload = CatchAsyncErrors(
@@ -209,3 +211,169 @@ interface IAnswerData {
 	contentId: string;
 	questionId: string;
 }
+export const addAnswer = CatchAsyncErrors(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { answer, courseId, contentId, questionId }: IAnswerData = req.body;
+			const course = await courseModel.findById(courseId);
+			if (!course) {
+				return next(new ErrorHandler("Course not found", 404));
+			}
+			if (!mongoose.Types.ObjectId.isValid(contentId)) {
+				return next(new ErrorHandler("Invalid content id", 400));
+			}
+			const courseContent = course?.courseData.find((item: any) =>
+				item._id.equals(contentId),
+			);
+			if (!courseContent) {
+				return next(new ErrorHandler("Content not found", 404));
+			}
+			const question = courseContent?.questions?.find((item: any) =>
+				item._id.equals(questionId),
+			);
+			if (!question) {
+				return next(new ErrorHandler("Question not found", 404));
+			}
+
+			// Create answer
+			const newAnswer: any = {
+				user: req.user,
+				answer,
+			};
+
+			// Add answer to question object in course
+			question.questionReplies.push(newAnswer);
+
+			// Save course
+			await course?.save();
+
+			// Validation Logic
+			if (req.user?._id === question.user._id) {
+				// Create a notification for the use
+				return next(
+					new ErrorHandler("You cannot answer your own question", 400),
+				);
+			} else {
+				const data = {
+					name: question.user.name,
+					title: courseContent.title,
+					question: question.question,
+					answer,
+					email: question.user.email,
+				};
+				const html = await ejs.renderFile(
+					path.join(__dirname, "../mails/question-reply.ejs"),
+					{ data }, // Pass the data object here
+				);
+				try {
+					await sendEmail({
+						email: data.email,
+						subject: "Question Reply",
+						template: "question-reply.ejs",
+						data,
+					});
+				} catch (error: any) {
+					return next(new ErrorHandler(error.message, 500));
+				}
+			}
+			res.status(200).json({
+				success: true,
+				course,
+			});
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	},
+);
+
+// Add course Review
+interface IReviewData {
+	review: string;
+	courseId: string;
+	rating: number;
+	userId: string;
+}
+
+export const addReview = CatchAsyncErrors(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const userCourseList = req.user?.courses;
+			const courseId = req.params.id;
+
+			// Validate the course ID
+			const courseExits = userCourseList?.some(
+				(course: any) => course._id.toString() === courseId,
+			);
+			if (!courseExits) {
+				return next(new ErrorHandler("Course not found", 404));
+			}
+			const course = await courseModel.findById(courseId);
+			const review: any = {
+				user: req.user,
+				comment: req.body.review,
+				rating: req.body.rating,
+			};
+
+			course?.reviews.push(review);
+
+			let avg = 0;
+			course?.reviews.forEach((item: any) => {
+				avg += item.rating;
+			});
+			if (course) {
+				course.ratings = avg / course.reviews.length;
+			}
+
+			await course?.save();
+
+			const notification: any = {
+				title: "New Review Received",
+				message: `${req.user?.name} has reviewed your ${course?.name} course`,
+			};
+
+			// TODO: Create notification
+
+			res.status(200).json({
+				success: true,
+				course,
+			});
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	},
+);
+
+// Reply to reviews
+interface IReviewData {
+	comment: string;
+	courseId: string;
+	reviewId: string;
+}
+export const replyToReview = CatchAsyncErrors(
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { comment, courseId, reviewId }: IReviewData = req.body;
+
+			const course = await courseModel.findById(courseId);
+			if (!course) {
+				return next(new ErrorHandler("Course not found", 404));
+			}
+
+			const review = course?.reviews?.find((item: any) =>
+				item._id.equals(reviewId),
+			);
+			if (!review) {
+				return next(new ErrorHandler("Review not found", 404));
+			}
+			const replyData: any = {
+				user: req.user,
+				comment,
+			};
+			course.reviews.push(replyData);
+
+			await course?.save();
+		} catch (error: any) {
+			return next(new ErrorHandler(error.message, 500));
+		}
+	},
+);
