@@ -189,21 +189,29 @@ export const updateAccessToken = CatchAsyncErrors(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const refresh_token = req.cookies.refresh_token;
-			const decoded = jwt.verify(
-				refresh_token,
-				process.env.REFRESH_TOKEN! as string,
-			) as JwtPayload;
+			// Verify the refresh_token, but don't throw an error if it's expired
+			let decoded;
+			try {
+				decoded = jwt.verify(
+					refresh_token,
+					process.env.REFRESH_TOKEN as string,
+				) as JwtPayload;
+			} catch (jwtError) {
+				// If the refresh_token is expired, decoded will be undefined
+				decoded = undefined;
+			}
 
-			const message = "Access token updated was unsuccessfully";
+			const message = "Access token update was unsuccessful";
 			if (!decoded) {
 				return next(new ErrorHandler(message, 400));
 			}
+
 			const session = await redis.get(decoded.id as string);
 
 			if (!session) {
 				return next(new ErrorHandler(message, 400));
 			}
-			// req.user = JSON.parse(user);
+
 			const user = JSON.parse(session);
 			const accessToken = jwt.sign(
 				{ id: user._id },
@@ -214,8 +222,9 @@ export const updateAccessToken = CatchAsyncErrors(
 			const refreshToken = jwt.sign(
 				{ id: user._id },
 				process.env.REFRESH_TOKEN! as string,
-				{ expiresIn: "5m" },
+				{ expiresIn: "3d" }, // Set the expiration for the new refreshToken
 			);
+
 			req.user = user;
 			res.cookie("access_token", accessToken, accessTokenOptions);
 			res.cookie("refresh_token", refreshToken, refreshTokenOptions);

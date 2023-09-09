@@ -54,4 +54,7 @@ userRouter.put(
 	isAuthenticated,
 	updateProfilePicture,
 );
+
+// Course routes 
+
 export default userRouter;
