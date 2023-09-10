@@ -47,10 +47,7 @@ export const registerUser = CatchAsyncErrors(
 			const activationToken = createActivationToken(user);
 			const activationCode = activationToken.activationCode;
 
-			const data = {
-				user: { name: user.name },
-				activationCode,
-			};
+			const data = { user: { name: user.name }, activationCode };
 			const html = await ejs.renderFile(
 				path.join(__dirname, "../mails/activation-mail.ejs"),
 				{ data }, // Pass the data object here
@@ -192,29 +189,21 @@ export const updateAccessToken = CatchAsyncErrors(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const refresh_token = req.cookies.refresh_token;
-			// Verify the refresh_token, but don't throw an error if it's expired
-			let decoded;
-			try {
-				decoded = jwt.verify(
-					refresh_token,
-					process.env.REFRESH_TOKEN as string,
-				) as JwtPayload;
-			} catch (jwtError) {
-				// If the refresh_token is expired, decoded will be undefined
-				decoded = undefined;
-			}
+			const decoded = jwt.verify(
+				refresh_token,
+				process.env.REFRESH_TOKEN! as string,
+			) as JwtPayload;
 
-			const message = "Access token update was unsuccessful";
+			const message = "Access token updated was unsuccessfully";
 			if (!decoded) {
 				return next(new ErrorHandler(message, 400));
 			}
-
 			const session = await redis.get(decoded.id as string);
 
 			if (!session) {
 				return next(new ErrorHandler(message, 400));
 			}
-
+			// req.user = JSON.parse(user);
 			const user = JSON.parse(session);
 			const accessToken = jwt.sign(
 				{ id: user._id },
@@ -225,9 +214,8 @@ export const updateAccessToken = CatchAsyncErrors(
 			const refreshToken = jwt.sign(
 				{ id: user._id },
 				process.env.REFRESH_TOKEN! as string,
-				{ expiresIn: "3d" }, // Set the expiration for the new refreshToken
+				{ expiresIn: "5m" },
 			);
-
 			req.user = user;
 			res.cookie("access_token", accessToken, accessTokenOptions);
 			res.cookie("refresh_token", refreshToken, refreshTokenOptions);
