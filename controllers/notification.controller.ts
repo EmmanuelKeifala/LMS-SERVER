@@ -5,7 +5,7 @@ import {CatchAsyncErrors} from '../middleware/catchAsyncErrors';
 
 // Module imports
 import {Request, Response, NextFunction} from 'express';
-
+import cron from 'node-cron';
 // Get notifications for admin
 export const getNotifications = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -53,4 +53,11 @@ export const updateNotification = CatchAsyncErrors(
   },
 );
 
-
+// Automatically delete outdated notifications
+cron.schedule('0 0 0  * * *', async () => {
+  const thirtyDayAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  await notificationModel.deleteMany({
+    status: 'read',
+    createdAt: {$lt: thirtyDayAgo},
+  });
+});
