@@ -80,7 +80,7 @@ export const createOrder = CatchAsyncErrors(
       });
 
       if (course.purchased) {
-        course.purchased += 1;
+        course.purchased ? (course.purchased += 1) : course.purchased;
       }
       await course?.save();
       createNewOrder(orderData, res, next);
