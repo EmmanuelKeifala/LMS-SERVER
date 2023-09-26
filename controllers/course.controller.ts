@@ -6,7 +6,7 @@ import ejs from 'ejs';
 // File Imports
 import {CatchAsyncErrors} from '../middleware/catchAsyncErrors';
 import ErrorHandler from '../utils/ErrorHandler';
-import {createCourse} from '../services/course.services';
+import {createCourse, getAllCoursesService} from '../services/course.services';
 import courseModel from '../models/course.model';
 import {redis} from '../utils/redis';
 import mongoose from 'mongoose';
@@ -394,6 +394,16 @@ export const replyToReview = CatchAsyncErrors(
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
+    }
+  },
+);
+
+export const getAllListedCourses = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAllCoursesService(res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   },
 );

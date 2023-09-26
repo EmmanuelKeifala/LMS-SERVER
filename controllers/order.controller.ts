@@ -12,7 +12,7 @@ import userModel, {IUser} from '../models/user.model';
 import courseModel from '../models/course.model';
 import sendEmail from '../utils/sendMail';
 import notificationModel from '../models/notification.model';
-import {createNewOrder} from '../services/order.services';
+import {createNewOrder, getAllOrdersService} from '../services/order.services';
 
 // Create oder
 export const createOrder = CatchAsyncErrors(
@@ -86,6 +86,17 @@ export const createOrder = CatchAsyncErrors(
       createNewOrder(orderData, res, next);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
+    }
+  },
+);
+
+// get all orders -- only for admin
+export const getAllOrders = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAllOrdersService(res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   },
 );
