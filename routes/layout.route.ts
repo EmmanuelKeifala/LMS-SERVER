@@ -1,6 +1,6 @@
 import expess from 'express';
 import {authorizeRoles, isAuthenticated} from '../middleware/auth';
-import {createLayout} from '../controllers/layout.controller';
+import {createLayout, editLayout} from '../controllers/layout.controller';
 
 const layoutRouter = expess.Router();
 
@@ -10,6 +10,14 @@ layoutRouter.post(
   isAuthenticated,
   authorizeRoles('admin'),
   createLayout,
+);
+
+// edit layout
+layoutRouter.post(
+  '/edit-layout',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  editLayout,
 );
 
 export default layoutRouter;
