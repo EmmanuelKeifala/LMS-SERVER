@@ -15,7 +15,11 @@ import {CatchAsyncErrors} from '../middleware/catchAsyncErrors';
 import sendEmail from '../utils/sendMail';
 import {sendToken, accessTokenOptions, refreshTokenOptions} from '../utils/jwt';
 import {redis} from '../utils/redis';
-import {getAllUserService, getUserById} from '../services/service';
+import {
+  getAllUserService,
+  getUserById,
+  updateUserRoleService,
+} from '../services/service';
 
 // Register user
 interface IRegistrationBody {
@@ -394,6 +398,19 @@ export const getAllUsers = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       getAllUserService(res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  },
+);
+
+// update user role -- only for admin
+export const updateUserRole = CatchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {id, role} = req.body;
+      const user = await userModel.findById(id);
+      updateUserRoleService(res, id, role);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
