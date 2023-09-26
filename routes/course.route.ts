@@ -14,6 +14,7 @@ import {
   replyToReview,
 } from '../controllers/course.controller';
 import {authorizeRoles, isAuthenticated} from '../middleware/auth';
+import {deleteCourse} from '../controllers/user.controller';
 const courseRouter = express.Router();
 
 // Create course
@@ -64,5 +65,13 @@ courseRouter.get(
   isAuthenticated,
   authorizeRoles('admin'),
   getAllListedCourses,
+);
+
+// Delete course
+courseRouter.delete(
+  '/delete-course/:id',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  deleteCourse,
 );
 export default courseRouter;
